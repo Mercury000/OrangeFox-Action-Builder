@@ -118,6 +118,8 @@ jobs:
           "${GITHUB_WORKSPACE}/patches/fox_12.1/0002-system-build-properties.patch"
         git -C "${RECOVERY_ROOT}" apply \
           "${GITHUB_WORKSPACE}/patches/fox_12.1/0001-recovery-ui-fixes.patch"
+        python3 "${GITHUB_WORKSPACE}/patches/fox_12.1/apply-about-card-fix.py" \
+          "${RECOVERY_ROOT}"
         git -C "${VENDOR_ROOT}" apply \
           "${GITHUB_WORKSPACE}/patches/fox_12.1/0002-system-build-properties.patch"
         bash -n "${VENDOR_ROOT}/FoxExtras/sbin/foxstart.sh"
