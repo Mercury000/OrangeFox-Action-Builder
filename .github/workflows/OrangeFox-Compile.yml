@@ -92,14 +92,6 @@ jobs:
         cd ${{ inputs.DEVICE_PATH }}
         echo "COMMIT_ID=$(git rev-parse HEAD)" >> $GITHUB_ENV
 
-    - name: Apply vermeer device fixes
-      if: inputs.MANIFEST_BRANCH == '12.1' && inputs.DEVICE_NAME == 'vermeer'
-      run: |
-        set -euo pipefail
-        DEVICE_ROOT="${GITHUB_WORKSPACE}/OrangeFox/fox_${{ inputs.MANIFEST_BRANCH }}/${{ inputs.DEVICE_PATH }}"
-        DEVICE_PATCH="${GITHUB_WORKSPACE}/patches/fox_12.1/0003-vermeer-device-tree-fixes.patch"
-        git -C "${DEVICE_ROOT}" apply --check "${DEVICE_PATCH}"
-        git -C "${DEVICE_ROOT}" apply "${DEVICE_PATCH}"
 
     - name: Add maintainer avatar
       run: |
