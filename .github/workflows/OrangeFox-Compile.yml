@@ -69,7 +69,7 @@ jobs:
       
     - name: Build Environment
       run: |
-        sudo apt install aria2 -y
+        sudo apt install aria2 imagemagick -y
         git clone https://gitlab.com/OrangeFox/misc/scripts.git -b master
         cd scripts
         sudo bash setup/android_build_env.sh
@@ -91,6 +91,35 @@ jobs:
         git clone ${{ inputs.DEVICE_TREE }} -b ${{ inputs.DEVICE_TREE_BRANCH }} ./${{ inputs.DEVICE_PATH }}
         cd ${{ inputs.DEVICE_PATH }}
         echo "COMMIT_ID=$(git rev-parse HEAD)" >> $GITHUB_ENV
+
+    - name: Add maintainer avatar
+      run: |
+        set -euo pipefail
+        FOX_ROOT="${GITHUB_WORKSPACE}/OrangeFox/fox_${{ inputs.MANIFEST_BRANCH }}"
+        AVATAR_TMP="$(mktemp --suffix=.jpg)"
+        curl --fail --location --retry 3 \
+          --output "${AVATAR_TMP}" \
+          "https://github.com/Mercury000.png?size=256"
+        convert "${AVATAR_TMP}" -auto-orient -resize 192x192^ -gravity center -extent 192x192 \
+          "${FOX_ROOT}/bootable/recovery/gui/theme/portrait_hdpi/images/Default/About/maintainer.png"
+        test -s "${FOX_ROOT}/bootable/recovery/gui/theme/portrait_hdpi/images/Default/About/maintainer.png"
+
+    - name: Apply OrangeFox fixes
+      if: inputs.MANIFEST_BRANCH == '12.1'
+      run: |
+        set -euo pipefail
+        FOX_ROOT="${GITHUB_WORKSPACE}/OrangeFox/fox_${{ inputs.MANIFEST_BRANCH }}"
+        RECOVERY_ROOT="${FOX_ROOT}/bootable/recovery"
+        VENDOR_ROOT="${FOX_ROOT}/vendor/recovery"
+        git -C "${RECOVERY_ROOT}" apply --check \
+          "${GITHUB_WORKSPACE}/patches/fox_12.1/0001-recovery-ui-fixes.patch"
+        git -C "${VENDOR_ROOT}" apply --check \
+          "${GITHUB_WORKSPACE}/patches/fox_12.1/0002-system-build-properties.patch"
+        git -C "${RECOVERY_ROOT}" apply \
+          "${GITHUB_WORKSPACE}/patches/fox_12.1/0001-recovery-ui-fixes.patch"
+        git -C "${VENDOR_ROOT}" apply \
+          "${GITHUB_WORKSPACE}/patches/fox_12.1/0002-system-build-properties.patch"
+        bash -n "${VENDOR_ROOT}/FoxExtras/sbin/foxstart.sh"
 
     - name: Building OrangeFox
       run: |

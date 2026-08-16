@@ -1,0 +1,45 @@
+From 9fec4a9c221482629c5c53378aeba6c532f0af56 Mon Sep 17 00:00:00 2001
+From: Codex <codex@local.invalid>
+Date: Sun, 16 Aug 2026 22:48:46 +0800
+Subject: [PATCH] Fix slider rendering and advanced menu bounds
+
+---
+ gui/slidervalue.cpp                        | 8 ++++++++
+ gui/theme/portrait_hdpi/resources/vars.xml | 2 +-
+ 2 files changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/gui/slidervalue.cpp b/gui/slidervalue.cpp
+index b068b2e..3c0c625 100755
+--- a/gui/slidervalue.cpp
++++ b/gui/slidervalue.cpp
+@@ -71,6 +71,14 @@ GUISliderValue::GUISliderValue(xml_node<>* node) : GUIObject(node)
+ 	mHandleImage = NULL;
+ 	mHandleHoverImage = NULL;
+ 	mDragging = false;
++	mFont = NULL;
++	mLabelW = 0;
++	mPadding = 0;
++	mFontHeight = 0;
++	mLineW = 0;
++	mSliderY = 0;
++
++	// Optional XML resources must never leave render state uninitialized.
+ 
+ 	mLabel = NULL;
+ 	ConvertStrToColor("white", &mTextColor);
+diff --git a/gui/theme/portrait_hdpi/resources/vars.xml b/gui/theme/portrait_hdpi/resources/vars.xml
+index 7dcffc2..308d27e 100644
+--- a/gui/theme/portrait_hdpi/resources/vars.xml
++++ b/gui/theme/portrait_hdpi/resources/vars.xml
+@@ -437,7 +437,7 @@
+ 		<variable name="main_switch_icon_x" value="946"/>
+ 
+ 		<!-- Advanced -->
+-		<variable name="adv_additions_h" value="%screen_w%-200"/>
++		<variable name="adv_additions_h" value="%screen_h%-1380-%cutout_w%"/>
+ 
+ 		<!-- Sort menu -->
+ 		<variable name="ab_menu_y" value="72+%cutout_w%"/>
+-- 
+2.47.0.windows.2
+
