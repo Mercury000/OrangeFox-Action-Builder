@@ -1,15 +1,48 @@
-From 9fec4a9c221482629c5c53378aeba6c532f0af56 Mon Sep 17 00:00:00 2001
-From: Codex <codex@local.invalid>
-Date: Sun, 16 Aug 2026 22:48:46 +0800
-Subject: [PATCH] Fix slider rendering and advanced menu bounds
-
----
- gui/slidervalue.cpp                        | 8 ++++++++
- gui/theme/portrait_hdpi/resources/vars.xml | 2 +-
- 2 files changed, 9 insertions(+), 1 deletion(-)
-
+diff --git a/gui/battery.cpp b/gui/battery.cpp
+index 9fca830..d75cef7 100644
+--- a/gui/battery.cpp
++++ b/gui/battery.cpp
+@@ -163,7 +163,15 @@ int GUIBattery::Render(void)
+ 
+ 		if (!finalImage || !finalImage->GetResource())
+ 			return -1;
+-		gr_blit(finalImage->GetResource(), 0, 0, mRenderW, mRenderH, mRenderX - iconRealX, mRenderY);
++		// The placement dimensions are logical theme dimensions and may not
++		// match the decoded SVG surface after non-uniform theme scaling. Read
++		// only the actual surface bounds; using mRenderW/mRenderH here can read
++		// past the image and leave a corrupted strip below the icon.
++		const int imageW = finalImage->GetWidth();
++		const int imageH = finalImage->GetHeight();
++		const int imageX = mRenderX - iconRealX + (mRenderW - imageW) / 2;
++		const int imageY = mRenderY + (mRenderH - imageH) / 2;
++		gr_blit(finalImage->GetResource(), 0, 0, imageW, imageH, imageX, imageY);
+ 
+ 
+ 		if (!mCharge || !mCharge->GetResource())
+diff --git a/gui/listbox.cpp b/gui/listbox.cpp
+index 426810b..d9b1099 100644
+--- a/gui/listbox.cpp
++++ b/gui/listbox.cpp
+@@ -332,7 +332,7 @@ int GUIListBox::NotifyVarChange(const std::string& varName, const std::string& v
+ 		return 0;
+ 
+ 	// Check to see if the variable that we are using to store the list selected value has been updated
+-	if (varName == mVariable) {
++	if (!mVariable.empty() && varName == mVariable) {
+ 		if (mVariable == "tw_crypto_user_id_list" &&
+ 			DataManager::GetStrValue("tw_crypto_user_id_list") == "") //don't update on click 
+ 			CreateEncryptUsersList();
+@@ -370,7 +370,7 @@ int GUIListBox::NotifyVarChange(const std::string& varName, const std::string& v
+ 				mUpdate = 1;
+ 			}
+ 		}
+-		else if (varName == mVariable) {
++		else if (!mVariable.empty() && varName == mVariable) {
+ 			if (item.variableValue == currentValue) {
+ 				item.selected = 1;
+ 				SetVisibleListLocation(mVisibleItems.empty() ? 0 : mVisibleItems.size()-1);
 diff --git a/gui/slidervalue.cpp b/gui/slidervalue.cpp
-index b068b2e..3c0c625 100755
+index b068b2e..4b1d859 100755
 --- a/gui/slidervalue.cpp
 +++ b/gui/slidervalue.cpp
 @@ -71,6 +71,14 @@ GUISliderValue::GUISliderValue(xml_node<>* node) : GUIObject(node)
@@ -27,6 +60,34 @@ index b068b2e..3c0c625 100755
  
  	mLabel = NULL;
  	ConvertStrToColor("white", &mTextColor);
+@@ -311,14 +319,23 @@ int GUISliderValue::Render(void)
+ 	}
+ 
+ 	// slider
+-	uint32_t sliderX = mLineX + (mValuePct*(mLineW - mSliderW))/100;
++	int sliderX = mLineX + (mValuePct*(mLineW - mSliderW))/100;
+ 
+ 	if (mHandleImage && mHandleImage->GetResource())
+ 	{
+-		gr_surface s = mHandleImage->GetResource();
++		ImageResource* handleImage = mHandleImage;
+ 		if (mDragging && mHandleHoverImage && mHandleHoverImage->GetResource())
+-			s = mHandleHoverImage->GetResource();
+-		gr_blit(s, 0, 0, mSliderW, mSliderH, sliderX, mLineY + (mLineH/2 - mSliderH/2));
++			handleImage = mHandleHoverImage;
++
++		// The configured dimensions describe the logical slider geometry. The
++		// loaded image may have different dimensions after theme scaling; use
++		// its real bounds as the source rectangle to avoid an out-of-bounds
++		// gr_blit on non-uniformly scaled displays.
++		const int handleW = handleImage->GetWidth();
++		const int handleH = handleImage->GetHeight();
++		const int handleX = sliderX + (mSliderW - handleW) / 2;
++		const int handleY = mLineY + (mLineH / 2 - handleH / 2);
++		gr_blit(handleImage->GetResource(), 0, 0, handleW, handleH, handleX, handleY);
+ 	}
+ 	else
+ 	{
 diff --git a/gui/theme/portrait_hdpi/resources/vars.xml b/gui/theme/portrait_hdpi/resources/vars.xml
 index 7dcffc2..308d27e 100644
 --- a/gui/theme/portrait_hdpi/resources/vars.xml
@@ -40,6 +101,81 @@ index 7dcffc2..308d27e 100644
  
  		<!-- Sort menu -->
  		<variable name="ab_menu_y" value="72+%cutout_w%"/>
--- 
-2.47.0.windows.2
-
+diff --git a/gui/theme/portrait_hdpi/themes/style.xml b/gui/theme/portrait_hdpi/themes/style.xml
+index 39512a1..24e7028 100644
+--- a/gui/theme/portrait_hdpi/themes/style.xml
++++ b/gui/theme/portrait_hdpi/themes/style.xml
+@@ -58,7 +58,7 @@
+ 		<image name="progress_fill_small" filename="Light/Progress/progress_fill_small"/>
+ 
+ 		<!-- About -->
+-		<image name="card" filename="SVG/About/card.svg" retainaspect="1" tint="#FFF8F2"/>
++		<image name="card" filename="SVG/About/card.svg" tint="#FFF8F2"/>
+ 		<image name="logo_about" filename="SVG/Logos/logo_o.svg" retainaspect="1"/>
+ 
+ 		<!-- Accents -->
+diff --git a/gui/theme/portrait_hdpi/themes/styles/Black.xml b/gui/theme/portrait_hdpi/themes/styles/Black.xml
+index f34f98e..687a96a 100644
+--- a/gui/theme/portrait_hdpi/themes/styles/Black.xml
++++ b/gui/theme/portrait_hdpi/themes/styles/Black.xml
+@@ -58,7 +58,7 @@
+ 		<image name="progress_fill_small" filename="Default/Progress/progress_fill_small"/>
+ 
+ 		<!-- About -->
+-		<image name="card" filename="SVG/About/card.svg" retainaspect="1" tint="#000000"/>
++		<image name="card" filename="SVG/About/card.svg" tint="#000000"/>
+ 		<image name="logo_about" filename="SVG/Logos/logo_w.svg" retainaspect="1"/>
+ 
+ 		<!-- Accents -->
+diff --git a/gui/theme/portrait_hdpi/themes/styles/Cream.xml b/gui/theme/portrait_hdpi/themes/styles/Cream.xml
+index 5af538b..f28e595 100644
+--- a/gui/theme/portrait_hdpi/themes/styles/Cream.xml
++++ b/gui/theme/portrait_hdpi/themes/styles/Cream.xml
+@@ -58,7 +58,7 @@
+ 		<image name="progress_fill_small" filename="Light/Progress/progress_fill_small"/>
+ 
+ 		<!-- About -->
+-		<image name="card" filename="SVG/About/card.svg" retainaspect="1" tint="#FFF8F2"/>
++		<image name="card" filename="SVG/About/card.svg" tint="#FFF8F2"/>
+ 		<image name="logo_about" filename="SVG/Logos/logo_o.svg" retainaspect="1"/>
+ 
+ 		<!-- Accents -->
+diff --git a/gui/theme/portrait_hdpi/themes/styles/Dark.xml b/gui/theme/portrait_hdpi/themes/styles/Dark.xml
+index 2517a74..3f43036 100644
+--- a/gui/theme/portrait_hdpi/themes/styles/Dark.xml
++++ b/gui/theme/portrait_hdpi/themes/styles/Dark.xml
+@@ -58,7 +58,7 @@
+ 		<image name="progress_fill_small" filename="Default/Progress/progress_fill_small"/>
+ 
+ 		<!-- About -->
+-		<image name="card" filename="SVG/About/card.svg" retainaspect="1" tint="#1f1811"/>
++		<image name="card" filename="SVG/About/card.svg" tint="#1f1811"/>
+ 		<image name="logo_about" filename="SVG/Logos/logo_w.svg" retainaspect="1"/>
+ 
+ 		<!-- Accents -->
+diff --git a/gui/theme/portrait_hdpi/themes/styles/Gray.xml b/gui/theme/portrait_hdpi/themes/styles/Gray.xml
+index fbbd480..d83235a 100644
+--- a/gui/theme/portrait_hdpi/themes/styles/Gray.xml
++++ b/gui/theme/portrait_hdpi/themes/styles/Gray.xml
+@@ -58,7 +58,7 @@
+ 		<image name="progress_fill_small" filename="Default/Progress/progress_fill_small"/>
+ 
+ 		<!-- About -->
+-		<image name="card" filename="SVG/About/card.svg" retainaspect="1" tint="#2A2B2E"/>
++		<image name="card" filename="SVG/About/card.svg" tint="#2A2B2E"/>
+ 		<image name="logo_about" filename="SVG/Logos/logo_w.svg" retainaspect="1"/>
+ 
+ 		<!-- Accents -->
+diff --git a/gui/theme/portrait_hdpi/themes/styles/Light.xml b/gui/theme/portrait_hdpi/themes/styles/Light.xml
+index 6bf2fe7..93e5608 100644
+--- a/gui/theme/portrait_hdpi/themes/styles/Light.xml
++++ b/gui/theme/portrait_hdpi/themes/styles/Light.xml
+@@ -58,7 +58,7 @@
+ 		<image name="progress_fill_small" filename="Light/Progress/progress_fill_small"/>
+ 
+ 		<!-- About -->
+-		<image name="card" filename="SVG/About/card.svg" retainaspect="1" tint="#FAFAFA"/>
++		<image name="card" filename="SVG/About/card.svg" tint="#FAFAFA"/>
+ 		<image name="logo_about" filename="SVG/Logos/logo_o.svg" retainaspect="1"/>
+ 
+ 		<!-- Accents -->
