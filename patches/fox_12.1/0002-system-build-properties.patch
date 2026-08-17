@@ -47,8 +47,8 @@ index b5671e1..5af3046 100755
 +
 +  (
 +     cd "$target" || exit 1
-+     find . -type f ! -name '.foxfiles.sha256' -print0 | LC_ALL=C sort -z | xargs -0 sha256sum > .foxfiles.sha256
-+     [ -s .foxfiles.sha256 ] && sha256sum --status -c .foxfiles.sha256
++     find . -type f ! -name 'foxfiles.sha256' -print0 | LC_ALL=C sort -z | xargs -0 sha256sum > foxfiles.sha256
++     [ -s foxfiles.sha256 ] && sha256sum --status -c foxfiles.sha256
 +  ) || return 1
 +}
  
