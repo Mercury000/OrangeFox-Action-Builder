@@ -519,10 +519,37 @@ index e8f2fc2..51c29cd 100755
 diff --git a/data.cpp b/data.cpp
 --- a/data.cpp
 +++ b/data.cpp
-@@ -1257,5 +1257,5 @@ void DataManager::SetDefaultValues()
+@@ -1257,6 +1257,6 @@ void DataManager::SetDefaultValues()
    mPersist.SetValue(TW_TIME_ZONE_VAR, OF_DEFAULT_TIMEZONE);
    mPersist.SetValue(TW_TIME_ZONE_GUISEL, OF_DEFAULT_TIMEZONE);
    mPersist.SetValue(TW_TIME_ZONE_GUIOFFSET, "0");
 -  mPersist.SetValue(TW_TIME_ZONE_GUIDST, "1");
 +  mPersist.SetValue(TW_TIME_ZONE_GUIDST, "0");
    mPersist.SetValue(TW_AUTO_REFLASHTWRP_VAR, "1");
+
+diff --git a/gui/theme/extra-languages/languages/zh_CN.xml b/gui/theme/extra-languages/languages/zh_CN.xml
+--- a/gui/theme/extra-languages/languages/zh_CN.xml
++++ b/gui/theme/extra-languages/languages/zh_CN.xml
+@@ -403,3 +403,3 @@
+         <string name="no_selinux">没有 SELinux 支持（无 libselinux）。</string>
+-        <string name="mtp_enabled">找不到 Media 存储。</string>
++        <string name="mtp_enabled">MTP 已启用</string>
+         <string name="mtp_disabled">已禁用 MTP</string>
+
+diff --git a/partition.cpp b/partition.cpp
+--- a/partition.cpp
++++ b/partition.cpp
+@@ -667,13 +667,12 @@ bool TWPartition::Mount(bool Display_Error) {
+ 	if (Mount_Point == "/persist" && Can_Be_Mounted) {
+ 		bool mounted = Is_Mounted();
+ 		if (mounted || Mount(false)) {
+ 			// Read the backup settings file
+ 			#ifndef OF_DEVICE_WITHOUT_PERSIST
+ 			DataManager::LoadPersistValues();
+ 			DataManager::FindPasswordBackup();
+ 			#endif
+-			TWFunc::Fixup_Time_On_Boot("/persist/time/");
+ 			if (!mounted)
+ 				UnMount(false);
+ 		}
+ 	}

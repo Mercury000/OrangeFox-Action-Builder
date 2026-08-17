@@ -2,7 +2,7 @@ diff --git a/OrangeFox_A12.sh b/OrangeFox_A12.sh
 index b5671e1..5af3046 100755
 --- a/OrangeFox_A12.sh
 +++ b/OrangeFox_A12.sh
-@@ -527,6 +527,51 @@ local F=$1
+@@ -527,6 +527,52 @@ local F=$1
     sed -i "s/declare -x //g" $F
  }
  
@@ -48,7 +48,8 @@ index b5671e1..5af3046 100755
 +  (
 +     cd "$target" || exit 1
 +     find . -type f ! -name 'foxfiles.sha256' -print0 | LC_ALL=C sort -z | xargs -0 sha256sum > foxfiles.sha256
-+     [ -s foxfiles.sha256 ] && sha256sum --status -c foxfiles.sha256
++     [ -s foxfiles.sha256 ] || { echo -e "${WHITEONRED}-- Missing FoxFiles manifest: $target/foxfiles.sha256${NC}"; exit 1; }
++     sha256sum --status -c foxfiles.sha256
 +  ) || return 1
 +}
  
