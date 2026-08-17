@@ -135,6 +135,12 @@ jobs:
           "${RECOVERY_ROOT}"
         git -C "${VENDOR_ROOT}" apply \
           "${GITHUB_WORKSPACE}/patches/fox_12.1/0002-system-build-properties.patch"
+        if [[ "${{ inputs.DEVICE_NAME }}" == "vermeer" ]]; then
+          git -C "${RECOVERY_ROOT}" apply --check \
+            "${GITHUB_WORKSPACE}/patches/fox_12.1/0003-vermeer-time-daemon.patch"
+          git -C "${RECOVERY_ROOT}" apply \
+            "${GITHUB_WORKSPACE}/patches/fox_12.1/0003-vermeer-time-daemon.patch"
+        fi
         bash -n "${VENDOR_ROOT}/FoxExtras/sbin/foxstart.sh"
 
     - name: Validate device image layout
