@@ -1,12 +1,3 @@
-From f9cac810f554b37aa87d465c7f035eff23657985 Mon Sep 17 00:00:00 2001
-From: Codex <codex@local.invalid>
-Date: Sun, 16 Aug 2026 22:48:58 +0800
-Subject: [PATCH] Read ROM metadata from system build properties only
-
----
- FoxExtras/sbin/foxstart.sh | 61 ++++++--------------------------------
- 1 file changed, 9 insertions(+), 52 deletions(-)
-
 diff --git a/FoxExtras/sbin/foxstart.sh b/FoxExtras/sbin/foxstart.sh
 index ec1580e..3efb4a4 100755
 --- a/FoxExtras/sbin/foxstart.sh
@@ -123,6 +114,119 @@ index ec1580e..3efb4a4 100755
        }
     fi # check for ROM fingerprints
     
--- 
-2.47.0.windows.2
-
+diff --git a/OrangeFox_A12.sh b/OrangeFox_A12.sh
+index b5671e1..5af3046 100755
+--- a/OrangeFox_A12.sh
++++ b/OrangeFox_A12.sh
+@@ -527,6 +527,51 @@ local F=$1
+    sed -i "s/declare -x //g" $F
+ }
+ 
++# Build the complete FoxFiles payload used by both the update zip and recovery image.
++# The recovery runtime installs this payload from /FFiles/FoxFiles to /sdcard/Fox/FoxFiles.
++prepare_foxfiles_payload() {
++local target="$1"
++local magisk_zip="$FOX_VENDOR_PATH/Files/Magisk.zip"
++
++  [ -z "$target" ] && { echo -e "${WHITEONRED}-- FoxFiles target is empty.${NC}"; return 1; }
++  [ ! -d "$FOX_VENDOR_PATH/FoxFiles" ] && { echo -e "${WHITEONRED}-- Missing vendor FoxFiles directory.${NC}"; return 1; }
++
++  rm -rf "$target"
++  mkdir -p "$target" || return 1
++  $CP -a "$FOX_VENDOR_PATH/FoxFiles/." "$target/" || return 1
++
++  if [ "$FOX_DELETE_AROMAFM" = "1" ]; then
++     echo -e "${GREEN}-- Omitting AromaFM from FoxFiles ...${NC}"
++     rm -rf "$target/AromaFM"
++  fi
++
++  if [ "$FOX_DELETE_INITD_ADDON" = "1" ]; then
++     echo -e "${GREEN}-- Omitting the init.d addon from FoxFiles ...${NC}"
++     rm -f "$target"/OF_initd*.zip
++  fi
++
++  if [ "$FOX_DELETE_MAGISK_ADDON" != "1" ] && [ "$FOX_MOVE_MAGISK_INSTALLER_TO_RAMDISK" != "1" ]; then
++     if [ -n "$FOX_USE_SPECIFIC_MAGISK_ZIP" ]; then
++        if [ -e "$FOX_USE_SPECIFIC_MAGISK_ZIP" ]; then
++           echo -e "${WHITEONGREEN}-- Using magisk zip: \"$FOX_USE_SPECIFIC_MAGISK_ZIP\" ${NC}"
++           magisk_zip="$FOX_USE_SPECIFIC_MAGISK_ZIP"
++        else
++           echo -e "${WHITEONRED}-- I cannot find \"$FOX_USE_SPECIFIC_MAGISK_ZIP\"! Using the default.${NC}"
++        fi
++     fi
++     [ ! -f "$magisk_zip" ] && { echo -e "${WHITEONRED}-- Missing Magisk addon: $magisk_zip${NC}"; return 1; }
++     $CP -pf "$magisk_zip" "$target/Magisk.zip" || return 1
++     $CP -pf "$magisk_zip" "$target/uninstall.zip" || return 1
++  else
++     rm -f "$target/Magisk.zip" "$target/uninstall.zip"
++  fi
++
++  (
++     cd "$target" || exit 1
++     find . -type f ! -name '.foxfiles.sha256' -print0 | LC_ALL=C sort -z | xargs -0 sha256sum > .foxfiles.sha256
++     [ -s .foxfiles.sha256 ] && sha256sum --status -c .foxfiles.sha256
++  ) || return 1
++}
+ 
+ # create zip file
+ do_create_update_zip() {
+@@ -609,8 +654,8 @@ local TDT=$(date "+%d %B %Y")
+   # copy installer bins and script
+   $CP -pr $INST_DIR/* .
+ 
+-  # copy FoxFiles/ to sdcard/Fox/
+-  $CP -a $FILES_DIR/ sdcard/Fox/
++  # create the same complete FoxFiles payload that is embedded in the recovery image
++  prepare_foxfiles_payload "$FOX_TMP_WORKING_DIR/sdcard/Fox/FoxFiles" || abort 1
+ 
+   # copy any custom bin files to /sdcard/Fox/bin/ ?
+   if [ "$(enabled $FOX_CUSTOM_BINS_TO_SDCARD)" = "1" -a -d "$FOX_BIN_tmp/bin" ]; then
+@@ -740,38 +785,6 @@ local TDT=$(date "+%d %B %Y")
+      sed -i -e "s/^FOX_INSTALLER_DISABLE_AUTOREBOOT=.*/FOX_INSTALLER_DISABLE_AUTOREBOOT=\"1\"/" $F
+   fi
+ 
+-  # omit AromaFM ?
+-  if [ "$FOX_DELETE_AROMAFM" = "1" ]; then
+-     echo -e "${GREEN}-- Deleting AromaFM ...${NC}"
+-     rm -rf $FOX_TMP_WORKING_DIR/sdcard/Fox/FoxFiles/AromaFM
+-  fi
+-
+-  # copy the magisk addon zip ?
+-  if [ "$FOX_DELETE_MAGISK_ADDON" != "1" ] && [ "$FOX_MOVE_MAGISK_INSTALLER_TO_RAMDISK" != "1" ]; then
+-     tmp=$FOX_VENDOR_PATH/Files/Magisk.zip
+-
+-     # are we using a specific magisk zip?
+-     if [ -n "$FOX_USE_SPECIFIC_MAGISK_ZIP" ]; then
+-        if [ -e $FOX_USE_SPECIFIC_MAGISK_ZIP ]; then
+-           echo -e "${WHITEONGREEN}-- Using magisk zip: \"$FOX_USE_SPECIFIC_MAGISK_ZIP\" ${NC}"
+-           tmp=$FOX_USE_SPECIFIC_MAGISK_ZIP
+-        else
+-           echo -e "${WHITEONRED}-- I cannot find \"$FOX_USE_SPECIFIC_MAGISK_ZIP\"! Using the default.${NC}"
+-        fi
+-     fi
+-
+-     $CP -pf $tmp $FOX_TMP_WORKING_DIR/sdcard/Fox/FoxFiles/Magisk.zip
+-     $CP -pf $tmp $FOX_TMP_WORKING_DIR/sdcard/Fox/FoxFiles/uninstall.zip
+-  fi
+-
+-  # OF_initd
+-  if [ "$FOX_DELETE_INITD_ADDON" = "1" ]; then
+-     echo -e "${GREEN}-- Deleting the initd addon ...${NC}"
+-     rm -f $FOX_TMP_WORKING_DIR/sdcard/Fox/FoxFiles/OF_initd*.zip
+-  else
+-     echo -e "${GREEN}-- Copying the initd addon ...${NC}"
+-  fi
+-  
+   # alternative/additional device codename?
+   if [ -n "$TARGET_DEVICE_ALT" ]; then
+      echo -e "${GREEN}-- Adding the alternative device codename(s): \"$TARGET_DEVICE_ALT\" ${NC}"
+@@ -1616,6 +1629,9 @@ if [ "$FOX_VENDOR_CMD" = "Fox_Before_Recovery_Image" ]; then
+   $CP -p $FOX_VENDOR_PATH/Files/translators.txt $FOX_RAMDISK/twres/translators.txt
+   $CP -p $FOX_VENDOR_PATH/Files/changelog.txt $FOX_RAMDISK/twres/changelog.txt
+ 
++  # Embed the complete addon payload so direct .img installs can deploy FoxFiles after decryption.
++  prepare_foxfiles_payload "$FOX_RAMDISK/FFiles/FoxFiles" || abort 1
++
+   # if a local callback script is declared, run it, passing to it the ramdisk directory (first call)
+   if [ -n "$FOX_LOCAL_CALLBACK_SCRIPT" -a -f "$FOX_LOCAL_CALLBACK_SCRIPT" ]; then
+ 	bash $FOX_LOCAL_CALLBACK_SCRIPT "$FOX_RAMDISK" "--first-call"

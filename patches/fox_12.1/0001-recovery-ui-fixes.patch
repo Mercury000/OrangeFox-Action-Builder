@@ -88,11 +88,158 @@ index b068b2e..4b1d859 100755
  	}
  	else
  	{
+diff --git a/gui/theme/portrait_hdpi/images/SVG/About/card.svg b/gui/theme/portrait_hdpi/images/SVG/About/card.svg
+index 3055dfc..c67e3ac 100644
+--- a/gui/theme/portrait_hdpi/images/SVG/About/card.svg
++++ b/gui/theme/portrait_hdpi/images/SVG/About/card.svg
+@@ -1,4 +1,4 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 336">
+-	<path display="inline" fill="#000000" fill-opacity="1" stroke-width="23.7514" stroke-linecap="round" d="M 71.845703,48 C 58.635534,48 48,58.635534 48,71.845703 V 264.1543 C 48,277.36447 58.635534,288 71.845703,288 H 1008.1543 C 1021.3645,288 1032,277.36447 1032,264.1543 V 71.845703 C 1032,58.635534 1021.3645,48 1008.1543,48 Z M 168,72 a 96,96 0 0 1 96,96 96,96 0 0 1 -96,96 96,96 0 0 1 -96,-96 96,96 0 0 1 96,-96 z" />
++	<path display="inline" fill="#000000" fill-opacity="1" stroke-width="23.7514" stroke-linecap="round" d="M 71.845703,48 C 58.635534,48 48,58.635534 48,71.845703 V 264.1543 C 48,277.36447 58.635534,288 71.845703,288 H 1008.1543 C 1021.3645,288 1032,277.36447 1032,264.1543 V 71.845703 C 1032,58.635534 1021.3645,48 1008.1543,48 Z" />
+ </svg>
+diff --git a/gui/theme/portrait_hdpi/pages/settings.xml b/gui/theme/portrait_hdpi/pages/settings.xml
+index db82784..5a4bb7b 100644
+--- a/gui/theme/portrait_hdpi/pages/settings.xml
++++ b/gui/theme/portrait_hdpi/pages/settings.xml
+@@ -1018,13 +1018,13 @@
+ 			<!-- Yan's Card -->
+ 			
+ 			<image>
+-				<image resource="author_yan"/>
+-				<placement x="%card_img_x%" y="%card_img1_y%"/>
++				<image resource="card"/>
++				<placement x="0" y="%card1_y%"/>
+ 			</image>
+ 
+ 			<image>
+-				<image resource="card"/>
+-				<placement x="0" y="%card1_y%"/>
++				<image resource="author_yan"/>
++				<placement x="%card_img_x%" y="%card_img1_y%"/>
+ 			</image>
+ 
+ 			<text style="about_name">
+@@ -1054,13 +1054,13 @@
+ 			<!-- fd's Card -->
+ 			
+ 			<image>
+-				<image resource="author_fd"/>
+-				<placement x="%card_img_x%" y="%card_img2_y%"/>
++				<image resource="card"/>
++				<placement x="0" y="%card2_y%"/>
+ 			</image>
+ 
+ 			<image>
+-				<image resource="card"/>
+-				<placement x="0" y="%card2_y%"/>
++				<image resource="author_fd"/>
++				<placement x="%card_img_x%" y="%card_img2_y%"/>
+ 			</image>
+ 
+ 			<text style="about_name">
+@@ -1088,16 +1088,16 @@
+ 			<!-- Card -->
+ 			
+ 			<!-- Bim's Card -->
+-			<image>
+-				<image resource="author_jabba"/>
+-				<placement x="%card_img_x%" y="%card_img3_y%"/>
+-			</image>
+-			
+ 			<image>
+ 				<image resource="card"/>
+ 				<placement x="0" y="%card3_y%"/>
+ 			</image>
+ 
++			<image>
++				<image resource="author_jabba"/>
++				<placement x="%card_img_x%" y="%card_img3_y%"/>
++			</image>
++
+ 			<text style="about_name">
+ 				<placement x="%card_txt_x%" y="%card_img3_y%"/>
+ 				<text>DarthJabba9</text>
+@@ -1124,19 +1124,19 @@
+ 			
+ 			<!-- Maintainer -->
+ 			<image>
+-				<image resource="maintainer_img"/>
++				<image resource="card"/>
+ 				<condition var1="of_maintainer" op="!=" var2="3"/>
+ 				<condition var1="of_maintainer" op="!=" var2="2"/>
+ 				<condition var1="of_maintainer" op="!=" var2="1"/>
+-				<placement x="%card_img_x%" y="%card_img4_y%"/>
++				<placement x="0" y="%card4_y%"/>
+ 			</image>
+-			
++
+ 			<image>
+-				<image resource="card"/>
++				<image resource="maintainer_img"/>
+ 				<condition var1="of_maintainer" op="!=" var2="3"/>
+ 				<condition var1="of_maintainer" op="!=" var2="2"/>
+ 				<condition var1="of_maintainer" op="!=" var2="1"/>
+-				<placement x="0" y="%card4_y%"/>
++				<placement x="%card_img_x%" y="%card_img4_y%"/>
+ 			</image>
+ 
+ 			<text style="about_name">
+diff --git a/gui/theme/portrait_hdpi/pages/templates/statusbar.xml b/gui/theme/portrait_hdpi/pages/templates/statusbar.xml
+index 4cb1f75..060faeb 100644
+--- a/gui/theme/portrait_hdpi/pages/templates/statusbar.xml
++++ b/gui/theme/portrait_hdpi/pages/templates/statusbar.xml
+@@ -23,7 +23,7 @@
+ 
+ 			<text style="text_status">
+ 				<condition var1="center_clock" var2="2"/>
+-				<placement x="%status_indent_left%" y="%status_info_y%"/>
++				<placement x="%status_clock_left_x%" y="%status_info_y%"/>
+ 				<text>%tw_time%</text>
+ 			</text>
+ 			<text style="text_status">
+@@ -122,4 +122,4 @@
+ 
+ 		</template>
+ 	</templates>
+-</recovery>
+\ No newline at end of file
++</recovery>
 diff --git a/gui/theme/portrait_hdpi/resources/vars.xml b/gui/theme/portrait_hdpi/resources/vars.xml
-index 7dcffc2..308d27e 100644
+index 7dcffc2..c1d8245 100644
 --- a/gui/theme/portrait_hdpi/resources/vars.xml
 +++ b/gui/theme/portrait_hdpi/resources/vars.xml
-@@ -437,7 +437,7 @@
+@@ -139,9 +139,9 @@
+ 		<variable name="nav_panel_w" value="%screen_w%-96"/>
+ 		<variable name="nav_panel_x" value="48"/>
+ 		<variable name="nav_panel_y" value="%screen_h%-360"/>
+-		<variable name="nav_icon_y" value="%screen_h%-282"/>
+-		<variable name="nav_text_y" value="%screen_h%-202"/>
+-		<variable name="nav_item_y" value="%screen_h%-252"/>
++		<variable name="nav_icon_y" value="%screen_h%-246"/>
++		<variable name="nav_text_y" value="%screen_h%-166"/>
++		<variable name="nav_item_y" value="%screen_h%-216"/>
+ 		<variable name="nav_item_1" value="171"/>
+ 		<variable name="nav_item_2" value="417"/>
+ 		<variable name="nav_item_3" value="663"/>
+@@ -151,7 +151,7 @@
+ 		
+ 		<variable name="np_pill_w" value="192"/>
+ 		<variable name="np_pill_h" value="96"/>
+-		<variable name="np_pill_y" value="%screen_h%-330"/>
++		<variable name="np_pill_y" value="%screen_h%-294"/>
+ 		<variable name="np_pill_x1" value="75"/> <!-- 48 + 27 -->
+ 		<variable name="np_pill_x2" value="321"/> <!-- 48 + 27 + np_pill_w + 27 + 27 -->
+ 		<variable name="np_pill_x3" value="567"/>
+@@ -346,6 +346,7 @@
+ 		<variable name="nav_h" value="144"/>
+ 		
+ 		<!-- Status Bar -->
++		<variable name="status_clock_left_x" value="%status_indent_left%+36"/>
+ 		<variable name="status_right_x" value="1060-%status_indent_right%"/>
+ 		
+ 		<!-- Big invisible button -->
+@@ -437,7 +438,7 @@
  		<variable name="main_switch_icon_x" value="946"/>
  
  		<!-- Advanced -->
@@ -101,3 +248,336 @@ index 7dcffc2..308d27e 100644
  
  		<!-- Sort menu -->
  		<variable name="ab_menu_y" value="72+%cutout_w%"/>
+diff --git a/gui/theme/portrait_hdpi/themes/style.xml b/gui/theme/portrait_hdpi/themes/style.xml
+index 39512a1..24e7028 100644
+--- a/gui/theme/portrait_hdpi/themes/style.xml
++++ b/gui/theme/portrait_hdpi/themes/style.xml
+@@ -58,7 +58,7 @@
+ 		<image name="progress_fill_small" filename="Light/Progress/progress_fill_small"/>
+ 
+ 		<!-- About -->
+-		<image name="card" filename="SVG/About/card.svg" retainaspect="1" tint="#FFF8F2"/>
++		<image name="card" filename="SVG/About/card.svg" tint="#FFF8F2"/>
+ 		<image name="logo_about" filename="SVG/Logos/logo_o.svg" retainaspect="1"/>
+ 
+ 		<!-- Accents -->
+diff --git a/gui/theme/portrait_hdpi/themes/styles/Black.xml b/gui/theme/portrait_hdpi/themes/styles/Black.xml
+index f34f98e..687a96a 100644
+--- a/gui/theme/portrait_hdpi/themes/styles/Black.xml
++++ b/gui/theme/portrait_hdpi/themes/styles/Black.xml
+@@ -58,7 +58,7 @@
+ 		<image name="progress_fill_small" filename="Default/Progress/progress_fill_small"/>
+ 
+ 		<!-- About -->
+-		<image name="card" filename="SVG/About/card.svg" retainaspect="1" tint="#000000"/>
++		<image name="card" filename="SVG/About/card.svg" tint="#000000"/>
+ 		<image name="logo_about" filename="SVG/Logos/logo_w.svg" retainaspect="1"/>
+ 
+ 		<!-- Accents -->
+diff --git a/gui/theme/portrait_hdpi/themes/styles/Cream.xml b/gui/theme/portrait_hdpi/themes/styles/Cream.xml
+index 5af538b..f28e595 100644
+--- a/gui/theme/portrait_hdpi/themes/styles/Cream.xml
++++ b/gui/theme/portrait_hdpi/themes/styles/Cream.xml
+@@ -58,7 +58,7 @@
+ 		<image name="progress_fill_small" filename="Light/Progress/progress_fill_small"/>
+ 
+ 		<!-- About -->
+-		<image name="card" filename="SVG/About/card.svg" retainaspect="1" tint="#FFF8F2"/>
++		<image name="card" filename="SVG/About/card.svg" tint="#FFF8F2"/>
+ 		<image name="logo_about" filename="SVG/Logos/logo_o.svg" retainaspect="1"/>
+ 
+ 		<!-- Accents -->
+diff --git a/gui/theme/portrait_hdpi/themes/styles/Dark.xml b/gui/theme/portrait_hdpi/themes/styles/Dark.xml
+index 2517a74..3f43036 100644
+--- a/gui/theme/portrait_hdpi/themes/styles/Dark.xml
++++ b/gui/theme/portrait_hdpi/themes/styles/Dark.xml
+@@ -58,7 +58,7 @@
+ 		<image name="progress_fill_small" filename="Default/Progress/progress_fill_small"/>
+ 
+ 		<!-- About -->
+-		<image name="card" filename="SVG/About/card.svg" retainaspect="1" tint="#1f1811"/>
++		<image name="card" filename="SVG/About/card.svg" tint="#1f1811"/>
+ 		<image name="logo_about" filename="SVG/Logos/logo_w.svg" retainaspect="1"/>
+ 
+ 		<!-- Accents -->
+diff --git a/gui/theme/portrait_hdpi/themes/styles/Gray.xml b/gui/theme/portrait_hdpi/themes/styles/Gray.xml
+index fbbd480..d83235a 100644
+--- a/gui/theme/portrait_hdpi/themes/styles/Gray.xml
++++ b/gui/theme/portrait_hdpi/themes/styles/Gray.xml
+@@ -58,7 +58,7 @@
+ 		<image name="progress_fill_small" filename="Default/Progress/progress_fill_small"/>
+ 
+ 		<!-- About -->
+-		<image name="card" filename="SVG/About/card.svg" retainaspect="1" tint="#2A2B2E"/>
++		<image name="card" filename="SVG/About/card.svg" tint="#2A2B2E"/>
+ 		<image name="logo_about" filename="SVG/Logos/logo_w.svg" retainaspect="1"/>
+ 
+ 		<!-- Accents -->
+diff --git a/gui/theme/portrait_hdpi/themes/styles/Light.xml b/gui/theme/portrait_hdpi/themes/styles/Light.xml
+index 6bf2fe7..93e5608 100644
+--- a/gui/theme/portrait_hdpi/themes/styles/Light.xml
++++ b/gui/theme/portrait_hdpi/themes/styles/Light.xml
+@@ -58,7 +58,7 @@
+ 		<image name="progress_fill_small" filename="Light/Progress/progress_fill_small"/>
+ 
+ 		<!-- About -->
+-		<image name="card" filename="SVG/About/card.svg" retainaspect="1" tint="#FAFAFA"/>
++		<image name="card" filename="SVG/About/card.svg" tint="#FAFAFA"/>
+ 		<image name="logo_about" filename="SVG/Logos/logo_o.svg" retainaspect="1"/>
+ 
+ 		<!-- Accents -->
+diff --git a/partitionmanager.cpp b/partitionmanager.cpp
+index ebdc3e7..5657857 100755
+--- a/partitionmanager.cpp
++++ b/partitionmanager.cpp
+@@ -2212,6 +2212,7 @@ void TWPartitionManager::Post_Decrypt(const string& Block_Device) {
+ 		if (!dat->Bind_Mount(false))
+ 			LOGERR("Unable to bind mount /sdcard to %s\n", dat->Storage_Path.c_str());
+ 		}
++		TWFunc::Install_Fox_Files();
+ 	} else
+ 		LOGERR("Unable to locate data partition.\n");
+ }
+diff --git a/twrp-functions.cpp b/twrp-functions.cpp
+index 7cac34d..ff101d3 100755
+--- a/twrp-functions.cpp
++++ b/twrp-functions.cpp
+@@ -37,6 +37,7 @@
+ #include <sys/vfs.h>
+ #include <sys/types.h>
+ #include <sys/wait.h>
++#include <limits.h>
+ #include <iostream>
+ #include <fstream>
+ #include <sstream>
+@@ -104,6 +105,140 @@ int OrangeFox_Startup_Executed = 0;
+ int Fox_Has_Welcomed = 0;
+ string Fox_Current_ROM = "";
+ 
++#ifndef BUILD_TWRPTAR_MAIN
++namespace {
++
++static const string kFoxFilesSource = "/FFiles/FoxFiles";
++
++static bool FoxFilesPathExists(const string& path) {
++	struct stat st;
++	return lstat(path.c_str(), &st) == 0;
++}
++
++static bool RemoveFoxFilesPath(const string& path) {
++	struct stat st;
++	if (lstat(path.c_str(), &st) != 0)
++		return errno == ENOENT;
++	if (S_ISDIR(st.st_mode))
++		return TWFunc::removeDir(path, false) == 0;
++	return unlink(path.c_str()) == 0;
++}
++
++static bool VerifyFoxFilesTree(const string& path) {
++	const string manifest = path + "/.foxfiles.sha256";
++	if (!FoxFilesPathExists(manifest)) {
++		LOGERR("FoxFiles manifest is missing: %s\n", manifest.c_str());
++		return false;
++	}
++	string output;
++	const string command = "cd " + path + " && /system/bin/sha256sum --status -c .foxfiles.sha256";
++	if (TWFunc::Exec_Cmd(command, output, true) != 0) {
++		LOGERR("FoxFiles checksum verification failed for %s: %s\n", path.c_str(), output.c_str());
++		return false;
++	}
++	return true;
++}
++
++static bool FilesHaveSameContents(const string& first, const string& second) {
++	ifstream first_file(first, ios::binary);
++	ifstream second_file(second, ios::binary);
++	if (!first_file.is_open() || !second_file.is_open())
++		return false;
++	ostringstream first_contents;
++	ostringstream second_contents;
++	first_contents << first_file.rdbuf();
++	second_contents << second_file.rdbuf();
++	return first_contents.str() == second_contents.str();
++}
++
++static bool CopyFoxFilesTree(const string& source, const string& destination) {
++	struct stat source_stat;
++	if (lstat(source.c_str(), &source_stat) != 0) {
++		LOGERR("Unable to stat FoxFiles source %s: %s\n", source.c_str(), strerror(errno));
++		return false;
++	}
++
++	if (S_ISDIR(source_stat.st_mode)) {
++		if (mkdir(destination.c_str(), 0775) != 0 && errno != EEXIST) {
++			LOGERR("Unable to create FoxFiles directory %s: %s\n", destination.c_str(), strerror(errno));
++			return false;
++		}
++		DIR* directory = opendir(source.c_str());
++		if (!directory) {
++			LOGERR("Unable to open FoxFiles directory %s: %s\n", source.c_str(), strerror(errno));
++			return false;
++		}
++		bool success = true;
++		struct dirent* entry;
++		while (success && (entry = readdir(directory)) != nullptr) {
++			if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, ".."))
++				continue;
++			const string child_source = source + "/" + entry->d_name;
++			const string child_destination = destination + "/" + entry->d_name;
++			success = CopyFoxFilesTree(child_source, child_destination);
++		}
++		closedir(directory);
++		return success;
++	}
++
++	if (S_ISREG(source_stat.st_mode))
++		return TWFunc::copy_file(source, destination, source_stat.st_mode & 0777, false) == 0;
++
++	if (S_ISLNK(source_stat.st_mode)) {
++		char link_target[PATH_MAX + 1];
++		ssize_t length = readlink(source.c_str(), link_target, PATH_MAX);
++		if (length < 0) {
++			LOGERR("Unable to read FoxFiles symlink %s: %s\n", source.c_str(), strerror(errno));
++			return false;
++		}
++		link_target[length] = '\0';
++		if (symlink(link_target, destination.c_str()) != 0) {
++			LOGERR("Unable to create FoxFiles symlink %s: %s\n", destination.c_str(), strerror(errno));
++			return false;
++		}
++		return true;
++	}
++
++	LOGERR("Unsupported FoxFiles entry: %s\n", source.c_str());
++	return false;
++}
++
++static bool SetFoxFilesMediaPermissions(const string& path) {
++	struct stat file_stat;
++	if (lstat(path.c_str(), &file_stat) != 0)
++		return false;
++
++	bool success = true;
++	if (S_ISDIR(file_stat.st_mode)) {
++		DIR* directory = opendir(path.c_str());
++		if (!directory)
++			return false;
++		struct dirent* entry;
++		while ((entry = readdir(directory)) != nullptr) {
++			if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, ".."))
++				continue;
++			if (!SetFoxFilesMediaPermissions(path + "/" + entry->d_name))
++				success = false;
++		}
++		closedir(directory);
++	}
++
++	if (!S_ISLNK(file_stat.st_mode)) {
++		if (setfilecon(path.c_str(), FOX_MEDIA_RW_DATA_FILE) != 0) {
++			LOGERR("Unable to set FoxFiles SELinux context on %s: %s\n", path.c_str(), strerror(errno));
++			success = false;
++		}
++		if (chown(path.c_str(), AID_MEDIA_RW, AID_MEDIA_RW) != 0) {
++			LOGERR("Unable to set FoxFiles ownership on %s: %s\n", path.c_str(), strerror(errno));
++			success = false;
++		}
++	}
++	return success;
++}
++
++} // namespace
++#endif // ndef BUILD_TWRPTAR_MAIN
++
+ /* is this an A/B device? */
+ static bool Is_AB_Device() 
+ {
+@@ -2784,6 +2919,10 @@ void TWFunc::OrangeFox_Startup(void)
+ 
+   OrangeFox_Startup_Executed++;
+ 
++  // Direct image installs contain FoxFiles in the recovery ramdisk. Deploy the
++  // exact payload only after decrypted /data and its /sdcard bind are usable.
++  TWFunc::Install_Fox_Files();
++
+   if (TWFunc::Path_Exists(FOX_PS_BIN)) 
+       chmod (FOX_PS_BIN, 0755);
+   
+@@ -2926,6 +3065,66 @@ void TWFunc::OrangeFox_Startup(void)
+   #endif
+ }
+ 
++bool TWFunc::Install_Fox_Files(void) {
++	const string destination = Fox_Home_Files;
++	const string staging = Fox_Home + "/.FoxFiles.installing";
++	const string previous = Fox_Home + "/.FoxFiles.previous";
++
++	if (!FoxFilesPathExists(kFoxFilesSource)) {
++		LOGERR("Embedded FoxFiles payload is missing: %s\n", kFoxFilesSource.c_str());
++		return false;
++	}
++	if (!PartitionManager.Is_Mounted_By_Path("/data") || !PartitionManager.Is_Mounted_By_Path("/sdcard")) {
++		LOGINFO("FoxFiles install deferred until /data and /sdcard are mounted\n");
++		return false;
++	}
++	if (!VerifyFoxFilesTree(kFoxFilesSource))
++		return false;
++
++	if (FoxFilesPathExists(destination) &&
++		FilesHaveSameContents(kFoxFilesSource + "/.foxfiles.sha256", destination + "/.foxfiles.sha256") &&
++		VerifyFoxFilesTree(destination)) {
++		LOGINFO("FoxFiles payload is already current\n");
++		return true;
++	}
++
++	if (!TWFunc::Recursive_Mkdir(Fox_Home)) {
++		LOGERR("Unable to create Fox home directory for FoxFiles\n");
++		return false;
++	}
++	if (!RemoveFoxFilesPath(staging) || !RemoveFoxFilesPath(previous)) {
++		LOGERR("Unable to clear FoxFiles staging paths\n");
++		return false;
++	}
++	if (!CopyFoxFilesTree(kFoxFilesSource, staging) || !VerifyFoxFilesTree(staging)) {
++		LOGERR("Unable to prepare the FoxFiles staging tree\n");
++		RemoveFoxFilesPath(staging);
++		return false;
++	}
++	if (!SetFoxFilesMediaPermissions(staging)) {
++		LOGERR("Unable to apply media permissions to FoxFiles staging tree\n");
++		RemoveFoxFilesPath(staging);
++		return false;
++	}
++
++	const bool had_previous = FoxFilesPathExists(destination);
++	if (had_previous && rename(destination.c_str(), previous.c_str()) != 0) {
++		LOGERR("Unable to stage the previous FoxFiles tree: %s\n", strerror(errno));
++		RemoveFoxFilesPath(staging);
++		return false;
++	}
++	if (rename(staging.c_str(), destination.c_str()) != 0) {
++		LOGERR("Unable to activate the FoxFiles tree: %s\n", strerror(errno));
++		if (had_previous)
++			rename(previous.c_str(), destination.c_str());
++		RemoveFoxFilesPath(staging);
++		return false;
++	}
++	RemoveFoxFilesPath(previous);
++	LOGINFO("Installed embedded FoxFiles payload at %s\n", destination.c_str());
++	return true;
++}
++
+ void TWFunc::copy_kernel_log(string curr_storage)
+ {
+   std::string dmesgDst = curr_storage + "/dmesg.log";
+diff --git a/twrp-functions.hpp b/twrp-functions.hpp
+index e8f2fc2..51c29cd 100755
+--- a/twrp-functions.hpp
++++ b/twrp-functions.hpp
+@@ -112,6 +112,7 @@ public:
+ 	static void Deactivation_Process(void);                     		// Run deactivation process...
+ 	static bool To_Skip_OrangeFox_Process(void);				// Return whether to skip the deactivation process
+ 	static void OrangeFox_Startup(void);        				// Run StartUP code for OrangeFox
++	static bool Install_Fox_Files(void);                         // Install the image-embedded FoxFiles payload after /data is ready
+ 	static int Recursive_Mkdir(string Path, bool ShowErr = true);           // Recursively makes the entire path
+ 	static void GUI_Operation_Text(string Read_Value, string Default_Text); // Updates text for display in the GUI, e.g. Backing up %partition name%
+ 	static void GUI_Operation_Text(string Read_Value, string Partition_Name, string Default_Text); // Same as above but includes partition name

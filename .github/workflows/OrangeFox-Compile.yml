@@ -101,9 +101,22 @@ jobs:
         curl --fail --location --retry 3 \
           --output "${AVATAR_TMP}" \
           "https://github.com/Mercury000.png?size=256"
-        convert "${AVATAR_TMP}" -auto-orient -resize 192x192^ -gravity center -extent 192x192 \
-          "${FOX_ROOT}/bootable/recovery/gui/theme/portrait_hdpi/images/Default/About/maintainer.png"
-        test -s "${FOX_ROOT}/bootable/recovery/gui/theme/portrait_hdpi/images/Default/About/maintainer.png"
+        normalize_about_avatar() {
+          local source="$1"
+          local output="$2"
+          local temporary
+          temporary="$(mktemp --suffix=.png)"
+          convert "${source}" -auto-orient -resize 192x192^ -gravity center -extent 192x192 -alpha set \
+            \( -size 192x192 xc:none -fill white -draw 'circle 96,96 96,0' \) \
+            -compose DstIn -composite "PNG32:${temporary}"
+          mv "${temporary}" "${output}"
+          test -s "${output}"
+        }
+        ABOUT_DIR="${FOX_ROOT}/bootable/recovery/gui/theme/portrait_hdpi/images/Default/About"
+        normalize_about_avatar "${AVATAR_TMP}" "${ABOUT_DIR}/maintainer.png"
+        for avatar in author_fd.png author_jabba.png author_yan.png; do
+          normalize_about_avatar "${ABOUT_DIR}/${avatar}" "${ABOUT_DIR}/${avatar}"
+        done
 
     - name: Apply OrangeFox fixes
       if: inputs.MANIFEST_BRANCH == '12.1'
