@@ -260,6 +260,19 @@ index ebdc3e7..5657857 100755
  	} else
  		LOGERR("Unable to locate data partition.\n");
  }
+@@ -3099,1 +3099,12 @@ bool TWPartitionManager::Enable_MTP(void) {
++	// MTP must not be started while encrypted /data still exposes only the
++	// pre-decryption media root. Otherwise the server has no valid base path
++	// and reports "Media storage not found".
++	TWPartition* mtp_storage = Get_Default_Storage_Partition();
++	if ((Storage_Is_Encrypted() && !DataManager::GetIntValue(TW_IS_DECRYPTED)) ||
++		!mtp_storage || !mtp_storage->Is_Present || !mtp_storage->Mount(false) ||
++		mtp_storage->Storage_Path.empty() ||
++		!TWFunc::Path_Exists(mtp_storage->Storage_Path)) {
++		LOGINFO("MTP not started: internal media storage is not mounted\n");
++		return false;
++	}
+ 	int mtppipe[2];
 diff --git a/twrp-functions.cpp b/twrp-functions.cpp
 index 7cac34d..ff101d3 100755
 --- a/twrp-functions.cpp
