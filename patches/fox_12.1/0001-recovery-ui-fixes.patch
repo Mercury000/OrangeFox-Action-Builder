@@ -296,13 +296,13 @@ index 7cac34d..ff101d3 100755
 +}
 +
 +static bool VerifyFoxFilesTree(const string& path) {
-+	const string manifest = path + "/.foxfiles.sha256";
++	const string manifest = path + "/foxfiles.sha256";
 +	if (!FoxFilesPathExists(manifest)) {
 +		LOGERR("FoxFiles manifest is missing: %s\n", manifest.c_str());
 +		return false;
 +	}
 +	string output;
-+	const string command = "cd " + path + " && /system/bin/sha256sum --status -c .foxfiles.sha256";
++	const string command = "cd " + path + " && /system/bin/sha256sum --status -c foxfiles.sha256";
 +	if (TWFunc::Exec_Cmd(command, output, true) != 0) {
 +		LOGERR("FoxFiles checksum verification failed for %s: %s\n", path.c_str(), output.c_str());
 +		return false;
@@ -445,7 +445,7 @@ index 7cac34d..ff101d3 100755
 +		return false;
 +
 +	if (FoxFilesPathExists(destination) &&
-+		FilesHaveSameContents(kFoxFilesSource + "/.foxfiles.sha256", destination + "/.foxfiles.sha256") &&
++		FilesHaveSameContents(kFoxFilesSource + "/foxfiles.sha256", destination + "/foxfiles.sha256") &&
 +		VerifyFoxFilesTree(destination)) {
 +		LOGINFO("FoxFiles payload is already current\n");
 +		return true;
@@ -503,3 +503,13 @@ index e8f2fc2..51c29cd 100755
  	static int Recursive_Mkdir(string Path, bool ShowErr = true);           // Recursively makes the entire path
  	static void GUI_Operation_Text(string Read_Value, string Default_Text); // Updates text for display in the GUI, e.g. Backing up %partition name%
  	static void GUI_Operation_Text(string Read_Value, string Partition_Name, string Default_Text); // Same as above but includes partition name
+diff --git a/data.cpp b/data.cpp
+--- a/data.cpp
++++ b/data.cpp
+@@ -1257,5 +1257,5 @@ void DataManager::SetDefaultValues()
+   mPersist.SetValue(TW_TIME_ZONE_VAR, OF_DEFAULT_TIMEZONE);
+   mPersist.SetValue(TW_TIME_ZONE_GUISEL, OF_DEFAULT_TIMEZONE);
+   mPersist.SetValue(TW_TIME_ZONE_GUIOFFSET, "0");
+-  mPersist.SetValue(TW_TIME_ZONE_GUIDST, "1");
++  mPersist.SetValue(TW_TIME_ZONE_GUIDST, "0");
+   mPersist.SetValue(TW_AUTO_REFLASHTWRP_VAR, "1");
