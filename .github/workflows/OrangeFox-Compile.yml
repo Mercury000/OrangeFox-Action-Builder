@@ -139,8 +139,8 @@ jobs:
 
     - name: Validate device image layout
       run: |
-        if [[ "${{ inputs.DEVICE_NAME }}" == "yupei" && "${{ inputs.BUILD_TARGET }}" != "recovery" ]]; then
-          echo "::error::Yupei has a separate recovery partition; BUILD_TARGET must be recovery."
+        if [[ "${{ inputs.DEVICE_NAME }}" == "yupei" && "${{ inputs.BUILD_TARGET }}" != "boot" ]]; then
+          echo "::error::Yupei uses BOARD_USES_RECOVERY_AS_BOOT=true; BUILD_TARGET must be boot."
           exit 1
         fi
 
@@ -168,12 +168,12 @@ jobs:
         fi
         echo "DEVICE_TREE_URL=${DEVICE_TREE_URL}" >> $GITHUB_ENV
 
-    - name: Verify Yupei recovery image
+    - name: Verify Yupei boot image
       if: inputs.DEVICE_NAME == 'yupei'
       run: |
         set -euo pipefail
         PRODUCT_OUT="${GITHUB_WORKSPACE}/OrangeFox/fox_${{ inputs.MANIFEST_BRANCH }}/out/target/product/${{ inputs.DEVICE_NAME }}"
-        test -s "${PRODUCT_OUT}/recovery.img"
+        test -s "${PRODUCT_OUT}/boot.img"
 
     - name: Upload OrangeFox artifacts to Release
       if: inputs.DEVICE_NAME != 'yupei'
@@ -190,11 +190,11 @@ jobs:
           Device: [Device Tree/Branch](${{ env.DEVICE_TREE_URL }}/tree/${{ inputs.DEVICE_TREE_BRANCH }})
           Commit: Most recent [commit](${{ env.DEVICE_TREE_URL }}/commit/${{ env.COMMIT_ID }}) during building.
 
-    - name: Upload Yupei recovery image to Release
+    - name: Upload Yupei boot image to Release
       if: inputs.DEVICE_NAME == 'yupei'
       uses: softprops/action-gh-release@v2
       with:
-        files: OrangeFox/fox_${{ inputs.MANIFEST_BRANCH }}/out/target/product/${{ inputs.DEVICE_NAME }}/recovery.img
+        files: OrangeFox/fox_${{ inputs.MANIFEST_BRANCH }}/out/target/product/${{ inputs.DEVICE_NAME }}/boot.img
         name: OrangeFox Recovery for ${{ inputs.DEVICE_NAME }} // ${{ env.BUILD_DATE }}
         tag_name: ${{ github.run_id }}
         body: |
